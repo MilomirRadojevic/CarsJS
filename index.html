@@ -9,12 +9,13 @@
   </head>
 
   <body>
-    <div id="top">
-      <input type="text" id="left"></input>
-      <input type="text" id="right" onclick="filterCars()" readonly></input>
+    <div id="wrapper">
+      <div id="top">
+        <input type="text" id="left"></input>
+        <input type="text" id="right" onclick="filterCars()" readonly></input>
+      </div>
+      <table id="carTable"></table>    
+      <canvas id="road"></canvas>
     </div>
-    <table id="carTable"></table>
-    
-    <canvas id="road"></canvas>
   </body>
 </html>

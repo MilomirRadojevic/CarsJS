@@ -2,12 +2,13 @@ let data = {};
 let cars = [];
 
 const drawButtonBg = function() {
-  let buttonBgImage = document.createElement('canvas');        
+  let buttonBgImage = document.createElement('canvas');
   var ctx = buttonBgImage.getContext("2d");
 
   ctx.translate(22, 0);
   ctx.rotate(45 * Math.PI / 180);
 
+  ctx.beginPath();
   ctx.moveTo(10, 6);
   ctx.lineTo(18, 6);
   ctx.stroke();
@@ -62,6 +63,8 @@ const updateCarTable = function() {
     frame.appendChild(img);
     frame.appendChild(check);
   }
+  
+  drawRoad();
 };
 
 const filterCars = function() {
@@ -86,8 +89,40 @@ const drawRoad = function() {
     }
   }
   
+  let height = Math.max(1, countSelected);
   road.width = 900;
-  road.height = Math.max(1, countSelected) * 100;
+  road.height = height * 50 + 50;
+  
+  var ctx = road.getContext('2d');
+  ctx.lineWidth = 1;
+  
+  ctx.beginPath();
+  ctx.moveTo(road.width / 2, road.height);
+  ctx.arcTo(0, road.height, 0, 50, 10);
+  ctx.arcTo(0, 50, road.width, 50, 10);
+  ctx.arcTo(road.width, 50, road.width, road.height, 10);
+  ctx.arcTo(road.width, road.height, road.width / 2, road.height, 10);
+  ctx.lineTo(road.width / 2, road.height);
+  ctx.stroke();
+  
+  for(let i = 1; i < 10; i++) {
+ctx.font="15px Arial";
+    ctx.strokeStyle='black';
+    ctx.strokeText(i + 'xN', i / 10.0 * road.width - 12, 40);
+    ctx.beginPath();
+    ctx.moveTo(i / 10.0 * road.width, 50);
+    ctx.lineTo(i / 10.0 * road.width, road.height);
+    ctx.strokeStyle='#CCCCCC';
+    ctx.stroke();
+  }
+  
+  for(let i = 1; i < height; i++) {
+    ctx.beginPath();
+    ctx.moveTo(0, i * 50 + 50);
+    ctx.lineTo(road.width, i * 50 + 50);
+    ctx.strokeStyle='black';
+    ctx.stroke();
+  }
 };
 
 const loadJson = function() {
@@ -102,7 +137,6 @@ const loadJson = function() {
         cars.push(car);
       });
       updateCarTable();
-      drawRoad();
     }
   };
   

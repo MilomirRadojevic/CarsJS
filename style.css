@@ -1,7 +1,14 @@
+#wrapper {
+  position: relative;
+  margin: auto;
+  display: block;
+}
+
 table {
   border-collapse: collapse;
   border-style: hidden;
   clear: both;
+  margin: auto;
 }
 
 table td {
@@ -21,20 +28,25 @@ img {
   text-align: center;
   width: 80%;
   height: 70%;
-  margin: 0 auto;
+  margin: auto;
   border: 1px solid black;
 }
 
 input {
-  position:relative;
-  margin: 0 auto;
+  margin: auto;
+  display: inline-block;
   border: 1px solid black;
   height: 20px;
+}
+
+input[type='checkbox'] {
   float: left;
 }
 
 #top {
-  margin: 0 auto;
+  text-align: center;
+  margin: auto;
+  display: block;
 }
 
 #left {
@@ -54,8 +66,7 @@ input {
   cursor: pointer;
 }
 
-#road {
-  border-radius: 10px;
-  width: 900px;
-  border: 1px solid black;
+canvas {
+  margin: auto;
+  display: block;
 }
