@@ -91,28 +91,28 @@ const drawRoad = function() {
   
   let height = Math.max(1, countSelected);
   road.width = 900;
-  road.height = height * 50 + 50;
+  road.height = height * 50 + 150;
   
   var ctx = road.getContext('2d');
   ctx.lineWidth = 1;
   
   ctx.beginPath();
-  ctx.moveTo(road.width / 2, road.height);
-  ctx.arcTo(0, road.height, 0, 50, 10);
+  ctx.moveTo(road.width / 2, road.height - 100);
+  ctx.arcTo(0, road.height - 100, 0, 50, 10);
   ctx.arcTo(0, 50, road.width, 50, 10);
-  ctx.arcTo(road.width, 50, road.width, road.height, 10);
-  ctx.arcTo(road.width, road.height, road.width / 2, road.height, 10);
-  ctx.lineTo(road.width / 2, road.height);
+  ctx.arcTo(road.width, 50, road.width, road.height - 100, 10);
+  ctx.arcTo(road.width, road.height - 100, road.width / 2, road.height - 100, 10);
+  ctx.lineTo(road.width / 2, road.height - 100);
   ctx.stroke();
   
   for(let i = 1; i < 10; i++) {
-ctx.font="15px Arial";
-    ctx.strokeStyle='black';
-    ctx.strokeText(i + 'xN', i / 10.0 * road.width - 12, 40);
+    ctx.font="15px Arial";
+    ctx.strokeStyle = 'black';
+    ctx.strokeText(i + 'xN', i / 10.0 * road.width - 12, 30);
     ctx.beginPath();
     ctx.moveTo(i / 10.0 * road.width, 50);
-    ctx.lineTo(i / 10.0 * road.width, road.height);
-    ctx.strokeStyle='#CCCCCC';
+    ctx.lineTo(i / 10.0 * road.width, road.height - 100);
+    ctx.strokeStyle = '#CCCCCC';
     ctx.stroke();
   }
   
@@ -120,9 +120,31 @@ ctx.font="15px Arial";
     ctx.beginPath();
     ctx.moveTo(0, i * 50 + 50);
     ctx.lineTo(road.width, i * 50 + 50);
-    ctx.strokeStyle='black';
+    ctx.strokeStyle = 'black';
     ctx.stroke();
   }
+  
+  data.speed_limits.forEach((limit) => {
+    ctx.beginPath();
+    ctx.moveTo(limit.position * 1.0 * road.width / data.distance, 40);
+    ctx.lineTo(limit.position * 1.0 * road.width / data.distance, road.height - 80);
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'gray';
+    ctx.setLineDash([10, 10]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    ctx.beginPath();
+    ctx.lineWidth = 10;
+    ctx.arc(limit.position * 1.0 * road.width / data.distance, road.height - 50, 30, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#CCCCCC';
+    ctx.stroke();
+    
+    ctx.lineWidth = 1;
+    ctx.font = "30px Arial";
+    ctx.strokeStyle = 'black';
+    ctx.strokeText(limit.speed, limit.position * 1.0 * road.width / data.distance - 15, road.height - 40);
+  });
 };
 
 const loadJson = function() {
