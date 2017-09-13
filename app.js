@@ -2,6 +2,26 @@ let data = {};
 let cars = [];
 let selectedCars = [];
 
+/*let a = {}; a.x = 1;
+let b = {}; b.x = 5;
+let c = {}; c.x = 3;
+var points = [a, b, c];
+var points2 = [];
+points2.push(points[0]);
+points2.push(points[1]);
+points2.push(points[2]);
+points.sort(function(a, b){return a.x - b.x});
+
+points2[0].y = 6;
+points2[1].y = 7;
+points2[2].y = 8;
+
+console.log(points[0].x + " " + points[1].x + " " + points[2].x);
+console.log(points2[0].x + " " + points2[1].x + " " + points2[2].x);
+
+console.log(points[0].y + " " + points[1].y + " " + points[2].y);
+console.log(points2[0].y + " " + points2[1].y + " " + points2[2].y);*/
+
 const isNumberKey = function(evt) {
   let charCode = (evt.which) ? evt.which : event.keyCode
   if (charCode > 31 && (charCode < 48 || charCode > 57))
@@ -71,7 +91,7 @@ const updateCarTable = function() {
     check.type = 'checkbox';
     check.id = 'check' + i;
     check.onchange = function() {
-      drawRoad();
+      drawCars();
     };
     
     let frame = document.getElementById('frame' + i);
@@ -79,7 +99,7 @@ const updateCarTable = function() {
     frame.appendChild(check);
   }
   
-  drawRoad();
+  drawCars();
 };
 
 const filterCars = function() {
@@ -127,7 +147,7 @@ const drawText = function(ctx, font, text, x, y) {
   ctx.strokeText(text, x, y);
 }
 
-const drawRoundedRectangle = function(ctx, x1, x2, y1, y2) {
+const drawRoundedRectangle = function(ctx, x1, x2, y1, y2, fillColor) {
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(x2 - 20, y2);
@@ -137,6 +157,10 @@ const drawRoundedRectangle = function(ctx, x1, x2, y1, y2) {
   ctx.arcTo(x2, y2, x2 - 20, y2, 10);
   ctx.lineTo(x2 - 20, y2);
   ctx.stroke();
+  if(fillColor) {
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+  }
 };
 
 const drawRoad = function() {  
@@ -161,7 +185,7 @@ const drawRoad = function() {
   
   //ctx.clearRect(0, 0, road.width, road.height);
   
-  drawRoundedRectangle(ctx, 0, road.width, 50, road.height - 100);
+  drawRoundedRectangle(ctx, 0, road.width, 50, road.height - 100, null);
   
   for(let i = 1; i < 10; i++) {
     drawText(ctx, '15px Arial', i + 'xN', i / 10.0 * road.width - 12, 30);
@@ -188,29 +212,64 @@ const drawRoad = function() {
     
     drawDashedLine(ctx, lightPosition, 40, lightPosition, road.height - 90, 3);
     
-    drawRoundedRectangle(ctx, lightPosition - 20, lightPosition + 20, road.height - 90, road.height - 10);
+    drawRoundedRectangle(ctx, lightPosition - 20, lightPosition + 20, road.height - 90, road.height - 10, null);
     
     drawCircle(ctx, 1, lightPosition, road.height - 65, 12, '#DDDDDD');
     drawCircle(ctx, 1, lightPosition, road.height - 35, 12, '#DDDDDD');
   });
-  
-  drawCars();
 };
 
-const drawCars = function() {
+const drawCars = function(end) {
+  drawRoad();
+    
   selectedCars.forEach((car) => {
     let road = document.getElementById('road');    
-    let ctx = road.getContext('2d');
+    let ctx = road.getContext('2d');    
+    
+    let offset = road.width * 9.0 / 10.0;
+    offset = end ? offset : 0;
+    if(end) {
+      let tempCars = [];
+      for(let i = 0; i < selectedCars.length; i++) {
+        tempCars.push(selectedCars[i]);
+      }
+      
+      tempCars.sort(function(a, b) {
+        return b.speed - a.speed;
+      });
+      for(let i = 0; i < tempCars.length; i++) {
+        switch(i) {
+          case 0:
+            tempCars[i].fillColor = '#FFD700';
+            break;
+          case 1:
+            tempCars[i].fillColor = '#C0C0C0';
+            break;
+          case 2:
+            tempCars[i].fillColor = '#CD7F32';
+            break;
+          default:
+            tempCars[i].fillColor = null;
+        }
+      }
+    }
     
     for(let i = 0; i < selectedCars.length; i++) {
-      drawRoundedRectangle(ctx, 10, road.width / 10.0 - 10, i * 50 + 55, i * 50 + 95);
+      drawRoundedRectangle(ctx, 10 + offset, road.width / 10.0 - 10 + offset, i * 50 + 55, i * 50 + 95, selectedCars[i].fillColor);
+      
+      selectedCars[i].fillColor = null;
+      
       let img = document.getElementById('img' + selectedCars[i].ind);
       let widthDiff = 1.0 * (road.width / 10.0 - 20) / img.width;
       let heightDiff = 40.0 / img.height;
       let diff = Math.min(widthDiff, heightDiff);
-      ctx.drawImage(img, 10, i * 50 + 60, img.width * diff, img.height * diff);
+      ctx.drawImage(img, 10 + offset, i * 50 + 60, img.width * diff, img.height * diff);
     }
   });
+};
+
+const startAnimation = function() {
+  drawCars(true);
 };
 
 const loadJson = function() {
