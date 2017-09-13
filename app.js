@@ -1,26 +1,11 @@
 let data = {};
 let cars = [];
 let selectedCars = [];
-
-/*let a = {}; a.x = 1;
-let b = {}; b.x = 5;
-let c = {}; c.x = 3;
-var points = [a, b, c];
-var points2 = [];
-points2.push(points[0]);
-points2.push(points[1]);
-points2.push(points[2]);
-points.sort(function(a, b){return a.x - b.x});
-
-points2[0].y = 6;
-points2[1].y = 7;
-points2[2].y = 8;
-
-console.log(points[0].x + " " + points[1].x + " " + points[2].x);
-console.log(points2[0].x + " " + points2[1].x + " " + points2[2].x);
-
-console.log(points[0].y + " " + points[1].y + " " + points[2].y);
-console.log(points2[0].y + " " + points2[1].y + " " + points2[2].y);*/
+let finishedCars = [];
+let animationSpeed = null;
+let animationActive = false;
+let timer = null;
+let medals = ['#FFD700', '#C0C0C0', '#CD7F32', null, null];
 
 const isNumberKey = function(evt) {
   let charCode = (evt.which) ? evt.which : event.keyCode
@@ -90,7 +75,14 @@ const updateCarTable = function() {
     let check = document.createElement('input');
     check.type = 'checkbox';
     check.id = 'check' + i;
-    check.onchange = function() {
+    check.onchange = function() {  
+      finishedCars = [];
+      animationActive = false;
+      data.cars.forEach((car) => {
+        car.traveledDistance = 0;
+        car.finished = false;
+      });
+  
       drawCars();
     };
     
@@ -98,6 +90,13 @@ const updateCarTable = function() {
     frame.appendChild(img);
     frame.appendChild(check);
   }
+  
+  finishedCars = [];
+  animationActive = false;
+  data.cars.forEach((car) => {
+    car.traveledDistance = 0;
+    car.finished = false;
+  });
   
   drawCars();
 };
@@ -219,57 +218,95 @@ const drawRoad = function() {
   });
 };
 
-const drawCars = function(end) {
+const drawCars = function() {
   drawRoad();
-    
-  selectedCars.forEach((car) => {
-    let road = document.getElementById('road');    
-    let ctx = road.getContext('2d');    
-    
-    let offset = road.width * 9.0 / 10.0;
-    offset = end ? offset : 0;
-    if(end) {
-      let tempCars = [];
-      for(let i = 0; i < selectedCars.length; i++) {
-        tempCars.push(selectedCars[i]);
-      }
-      
-      tempCars.sort(function(a, b) {
-        return b.speed - a.speed;
-      });
-      for(let i = 0; i < tempCars.length; i++) {
-        switch(i) {
-          case 0:
-            tempCars[i].fillColor = '#FFD700';
-            break;
-          case 1:
-            tempCars[i].fillColor = '#C0C0C0';
-            break;
-          case 2:
-            tempCars[i].fillColor = '#CD7F32';
-            break;
-          default:
-            tempCars[i].fillColor = null;
+  
+  let road = document.getElementById('road');    
+  let ctx = road.getContext('2d'); 
+  
+  let realDistance = data.distance;
+  let screenDistance = road.width * 9.0 / 10.0;
+  
+  if(animationActive === false) {
+    selectedCars.forEach((car) => {
+      car.traveledDistance = 0;
+    });
+  } else {
+    selectedCars.forEach((car) => {
+      car.traveledDistance += car.currentSpeed;
+      if(car.traveledDistance >= screenDistance) {
+        car.currentSpeed = 0;
+        car.traveledDistance = screenDistance;
+        if(!car.finished) {
+          car.finished = true;
+          finishedCars.push(car);
         }
       }
+    });
+  }
+  
+  /*offset = end ? offset : 0;
+  if(end) {
+    let tempCars = [];
+    for(let i = 0; i < selectedCars.length; i++) {
+      tempCars.push(selectedCars[i]);
     }
     
-    for(let i = 0; i < selectedCars.length; i++) {
-      drawRoundedRectangle(ctx, 10 + offset, road.width / 10.0 - 10 + offset, i * 50 + 55, i * 50 + 95, selectedCars[i].fillColor);
-      
-      selectedCars[i].fillColor = null;
-      
-      let img = document.getElementById('img' + selectedCars[i].ind);
-      let widthDiff = 1.0 * (road.width / 10.0 - 20) / img.width;
-      let heightDiff = 40.0 / img.height;
-      let diff = Math.min(widthDiff, heightDiff);
-      ctx.drawImage(img, 10 + offset, i * 50 + 60, img.width * diff, img.height * diff);
+    tempCars.sort(function(a, b) {
+      return b.speed - a.speed;
+    });
+    for(let i = 0; i < tempCars.length; i++) {
+      switch(i) {
+        case 0:
+          tempCars[i].fillColor = '#FFD700';
+          break;
+        case 1:
+          tempCars[i].fillColor = '#C0C0C0';
+          break;
+        case 2:
+          tempCars[i].fillColor = '#CD7F32';
+          break;
+        default:
+          tempCars[i].fillColor = null;
+      }
     }
-  });
+  }*/
+  
+  for(let i = 0; i < finishedCars.length; i++) {
+    finishedCars[i].fillColor = medals[i];
+  }
+  
+  for(let i = 0; i < selectedCars.length; i++) {
+    drawRoundedRectangle(ctx, 10 + selectedCars[i].traveledDistance, road.width / 10.0 - 10 + selectedCars[i].traveledDistance, i * 50 + 55, i * 50 + 95, selectedCars[i].fillColor);
+    
+    selectedCars[i].fillColor = null;
+    
+    let img = document.getElementById('img' + selectedCars[i].ind);
+    let widthDiff = 1.0 * (road.width / 10.0 - 20) / img.width;
+    let heightDiff = 40.0 / img.height;
+    let diff = Math.min(widthDiff, heightDiff);
+    ctx.drawImage(img, 10 + selectedCars[i].traveledDistance, i * 50 + 60, img.width * diff, img.height * diff);
+  }
 };
 
 const startAnimation = function() {
-  drawCars(true);
+  animationSpeed = document.getElementById('left_bottom').value;
+  if(animationSpeed < 1) {animationSpeed = 1;}
+  if(animationSpeed > 10) {animationSpeed = 10;}
+  animationActive = true;
+  
+  finishedCars = [];
+  
+  selectedCars.forEach((car) => {
+    car.currentSpeed = car.speed * animationSpeed / 100.0;
+    car.traveledDistance = 0;
+    car.finished = false;
+  });
+  
+  if(timer !== null) {
+    clearInterval(timer);
+  }
+  timer = setInterval(drawCars, 30);
 };
 
 const loadJson = function() {
