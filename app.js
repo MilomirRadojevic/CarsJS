@@ -31,8 +31,13 @@ const updateCarTable = function() {
     let img = document.createElement('img');
     img.src = cars[i].image;
     
+    let check = document.createElement('input');
+    check.type = 'checkbox';
+    check.id = 'check' + i;
+    
     let frame = document.getElementById('frame' + i);
     frame.appendChild(img);
+    frame.appendChild(check);
   }
 };
 
