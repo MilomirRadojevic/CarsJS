@@ -145,6 +145,38 @@ const drawRoad = function() {
     ctx.strokeStyle = 'black';
     ctx.strokeText(limit.speed, limit.position * 1.0 * road.width / data.distance - 15, road.height - 40);
   });
+  
+  data.traffic_lights.forEach((light) => {
+    ctx.beginPath();
+    ctx.moveTo(light.position * 1.0 * road.width / data.distance, 40);
+    ctx.lineTo(light.position * 1.0 * road.width / data.distance, road.height - 90);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'gray';
+    ctx.setLineDash([10, 10]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    ctx.beginPath();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'black';
+    ctx.moveTo(light.position * 1.0 * road.width / data.distance, road.height - 10);
+    ctx.arcTo(light.position * 1.0 * road.width / data.distance - 20, road.height - 10, light.position * 1.0 * road.width / data.distance - 20, road.height - 90, 10);
+    ctx.arcTo(light.position * 1.0 * road.width / data.distance - 20, road.height - 90, light.position * 1.0 * road.width / data.distance + 20, road.height - 90, 10);
+    ctx.arcTo(light.position * 1.0 * road.width / data.distance + 20, road.height - 90, light.position * 1.0 * road.width / data.distance + 20, road.height - 10, 10);
+    ctx.arcTo(light.position * 1.0 * road.width / data.distance + 20, road.height - 10, light.position * 1.0 * road.width / data.distance, road.height - 10, 10);
+    ctx.lineTo(light.position * 1.0 * road.width / data.distance, road.height - 10);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(light.position * 1.0 * road.width / data.distance, road.height - 65, 12, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#DDDDDD';
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(light.position * 1.0 * road.width / data.distance, road.height - 35, 12, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#DDDDDD';
+    ctx.stroke();
+  });
 };
 
 const loadJson = function() {
