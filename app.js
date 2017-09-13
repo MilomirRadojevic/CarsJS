@@ -1,5 +1,6 @@
 let data = {};
 let cars = [];
+let selectedCars = [];
 
 const drawButtonBg = function() {
   let buttonBgImage = document.createElement('canvas');
@@ -18,8 +19,8 @@ const drawButtonBg = function() {
   ctx.stroke();
 
   let r = document.getElementById('right');
-  var dataURL = buttonBgImage.toDataURL("image/png");
-  r.style.backgroundImage = "url(" + dataURL + ")";
+  var dataURL = buttonBgImage.toDataURL('image/png');
+  r.style.backgroundImage = 'url(' + dataURL + ')';
 };
 
 const drawCarTable = function() {        
@@ -51,6 +52,7 @@ const updateCarTable = function() {
   for(let i = 0; i < cars.length; i++) {
     let img = document.createElement('img');
     img.src = cars[i].image;
+    img.id = 'img' + i;
     
     let check = document.createElement('input');
     check.type = 'checkbox';
@@ -78,104 +80,123 @@ const filterCars = function() {
   updateCarTable();
 };
 
+const drawSolidLine = function(ctx, x1, y1, x2, y2, color) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.strokeStyle = color;
+  ctx.stroke();
+};
+
+const drawDashedLine = function(ctx, x1, y1, x2, y2, width) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.lineWidth = width;
+  ctx.strokeStyle = 'gray';
+  ctx.setLineDash([10, 10]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+};
+
+const drawCircle = function(ctx, width, x, y, radius, color) {
+  ctx.beginPath();
+  ctx.lineWidth = width;
+  ctx.arc(x, y, radius, 0, 2 * Math.PI);
+  ctx.strokeStyle = color;
+  ctx.stroke();
+  ctx.lineWidth = 1;
+}
+
+const drawText = function(ctx, font, text, x, y) {
+  ctx.font = font;
+  ctx.strokeStyle = 'black';
+  ctx.strokeText(text, x, y);
+}
+
+const drawRoundedRectangle = function(ctx, x1, x2, y1, y2) {
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x2 - 20, y2);
+  ctx.arcTo(x1, y2, x1, y1, 10);
+  ctx.arcTo(x1, y1, x2, y1, 10);
+  ctx.arcTo(x2, y1, x2, y2, 10);
+  ctx.arcTo(x2, y2, x2 - 20, y2, 10);
+  ctx.lineTo(x2 - 20, y2);
+  ctx.stroke();
+};
+
 const drawRoad = function() {  
   let road = document.getElementById('road');
   
-  let countSelected = 0;
+  selectedCars = [];
   for(let i = 0; i < cars.length; i++) {
     let check = document.getElementById('check' + i);
     if(check.checked) {
-      countSelected += 1;
+      let car = cars[i];
+      car.ind = i;
+      selectedCars.push(car);
     }
   }
   
-  let height = Math.max(1, countSelected);
+  let height = Math.max(1, selectedCars.length);
   road.width = 900;
   road.height = height * 50 + 150;
   
-  var ctx = road.getContext('2d');
+  let ctx = road.getContext('2d');
   ctx.lineWidth = 1;
   
-  ctx.beginPath();
-  ctx.moveTo(road.width / 2, road.height - 100);
-  ctx.arcTo(0, road.height - 100, 0, 50, 10);
-  ctx.arcTo(0, 50, road.width, 50, 10);
-  ctx.arcTo(road.width, 50, road.width, road.height - 100, 10);
-  ctx.arcTo(road.width, road.height - 100, road.width / 2, road.height - 100, 10);
-  ctx.lineTo(road.width / 2, road.height - 100);
-  ctx.stroke();
+  //ctx.clearRect(0, 0, road.width, road.height);
+  
+  drawRoundedRectangle(ctx, 0, road.width, 50, road.height - 100);
   
   for(let i = 1; i < 10; i++) {
-    ctx.font="15px Arial";
-    ctx.strokeStyle = 'black';
-    ctx.strokeText(i + 'xN', i / 10.0 * road.width - 12, 30);
-    ctx.beginPath();
-    ctx.moveTo(i / 10.0 * road.width, 50);
-    ctx.lineTo(i / 10.0 * road.width, road.height - 100);
-    ctx.strokeStyle = '#CCCCCC';
-    ctx.stroke();
+    drawText(ctx, '15px Arial', i + 'xN', i / 10.0 * road.width - 12, 30);
+    
+    drawSolidLine(ctx, i / 10.0 * road.width, 50, i / 10.0 * road.width, road.height - 100, '#CCCCCC');
   }
   
   for(let i = 1; i < height; i++) {
-    ctx.beginPath();
-    ctx.moveTo(0, i * 50 + 50);
-    ctx.lineTo(road.width, i * 50 + 50);
-    ctx.strokeStyle = 'black';
-    ctx.stroke();
+    drawSolidLine(ctx, 0, i * 50 + 50, road.width, i * 50 + 50, 'black');
   }
   
   data.speed_limits.forEach((limit) => {
-    ctx.beginPath();
-    ctx.moveTo(limit.position * 1.0 * road.width / data.distance, 40);
-    ctx.lineTo(limit.position * 1.0 * road.width / data.distance, road.height - 80);
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = 'gray';
-    ctx.setLineDash([10, 10]);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    let limitPosition = limit.position * 1.0 * road.width / data.distance;
     
-    ctx.beginPath();
-    ctx.lineWidth = 10;
-    ctx.arc(limit.position * 1.0 * road.width / data.distance, road.height - 50, 30, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#CCCCCC';
-    ctx.stroke();
+    drawDashedLine(ctx, limitPosition, 40, limitPosition, road.height - 80, 5);
     
-    ctx.lineWidth = 1;
-    ctx.font = "30px Arial";
-    ctx.strokeStyle = 'black';
-    ctx.strokeText(limit.speed, limit.position * 1.0 * road.width / data.distance - 15, road.height - 40);
+    drawCircle(ctx, 10, limitPosition, road.height - 50, 30, '#CCCCCC');
+    
+    drawText(ctx, '30px Arial', limit.speed, limitPosition - 15, road.height - 40);
   });
   
   data.traffic_lights.forEach((light) => {
-    ctx.beginPath();
-    ctx.moveTo(light.position * 1.0 * road.width / data.distance, 40);
-    ctx.lineTo(light.position * 1.0 * road.width / data.distance, road.height - 90);
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = 'gray';
-    ctx.setLineDash([10, 10]);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    let lightPosition = light.position * 1.0 * road.width / data.distance;
     
-    ctx.beginPath();
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'black';
-    ctx.moveTo(light.position * 1.0 * road.width / data.distance, road.height - 10);
-    ctx.arcTo(light.position * 1.0 * road.width / data.distance - 20, road.height - 10, light.position * 1.0 * road.width / data.distance - 20, road.height - 90, 10);
-    ctx.arcTo(light.position * 1.0 * road.width / data.distance - 20, road.height - 90, light.position * 1.0 * road.width / data.distance + 20, road.height - 90, 10);
-    ctx.arcTo(light.position * 1.0 * road.width / data.distance + 20, road.height - 90, light.position * 1.0 * road.width / data.distance + 20, road.height - 10, 10);
-    ctx.arcTo(light.position * 1.0 * road.width / data.distance + 20, road.height - 10, light.position * 1.0 * road.width / data.distance, road.height - 10, 10);
-    ctx.lineTo(light.position * 1.0 * road.width / data.distance, road.height - 10);
-    ctx.stroke();
+    drawDashedLine(ctx, lightPosition, 40, lightPosition, road.height - 90, 3);
     
-    ctx.beginPath();
-    ctx.arc(light.position * 1.0 * road.width / data.distance, road.height - 65, 12, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#DDDDDD';
-    ctx.stroke();
+    drawRoundedRectangle(ctx, lightPosition - 20, lightPosition + 20, road.height - 90, road.height - 10);
     
-    ctx.beginPath();
-    ctx.arc(light.position * 1.0 * road.width / data.distance, road.height - 35, 12, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#DDDDDD';
-    ctx.stroke();
+    drawCircle(ctx, 1, lightPosition, road.height - 65, 12, '#DDDDDD');
+    drawCircle(ctx, 1, lightPosition, road.height - 35, 12, '#DDDDDD');
+  });
+  
+  drawCars();
+};
+
+const drawCars = function() {
+  selectedCars.forEach((car) => {
+    let road = document.getElementById('road');    
+    let ctx = road.getContext('2d');
+    
+    for(let i = 0; i < selectedCars.length; i++) {
+      drawRoundedRectangle(ctx, 10, road.width / 10.0 - 10, i * 50 + 55, i * 50 + 95);
+      let img = document.getElementById('img' + selectedCars[i].ind);
+      let widthDiff = 1.0 * (road.width / 10.0 - 20) / img.width;
+      let heightDiff = 40.0 / img.height;
+      let diff = Math.min(widthDiff, heightDiff);
+      ctx.drawImage(img, 10, i * 50 + 60, img.width * diff, img.height * diff);
+    }
   });
 };
 
