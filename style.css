@@ -1,7 +1,8 @@
 table {
   border-collapse: collapse;
   border-style: hidden;
-  margin: auto;
+  margin: 0 auto;
+  clear: both;
 }
 
 table td {
@@ -16,11 +17,41 @@ img {
 }
 
 .frame {
-  border-radius: 20px;
+  border-radius: 10px;
   position:relative;
   text-align: center;
-  width: 90%;
-  height: 90%;
-  margin: auto;
+  width: 80%;
+  height: 70%;
+  margin: 0 auto;
   border: 1px solid black;
+}
+
+input {
+  position:relative;
+  margin: 0 auto;
+  border: 1px solid black;
+  height: 20px;
+  float: left;
+  /*background-color: white;*/
+}
+
+#top {
+  margin: 0 auto;
+}
+
+#left {
+  width: 850px;
+  border-radius: 10px 0px 0px 10px;
+  text-align: center;
+}
+
+#right {
+  width: 50px;
+  border-radius: 0px 10px 10px 0px;
+  color: transparent;
+}
+
+#right:hover {
+  background-color: #DDDDDD;
+  cursor: pointer;
 }

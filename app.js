@@ -21,6 +21,12 @@ const createCarTable = function() {
 
 const updateCarTable = function() {
   let table = document.getElementById('carTable');
+  for(let i = 0; i < 6; i++) {
+    let frame = document.getElementById('frame' + i);
+    while (frame.firstChild) {
+      frame.removeChild(frame.firstChild);
+    }
+  }
   for(let i = 0; i < cars.length; i++) {
     let img = document.createElement('img');
     img.src = cars[i].image;
@@ -28,6 +34,17 @@ const updateCarTable = function() {
     let frame = document.getElementById('frame' + i);
     frame.appendChild(img);
   }
+};
+
+const filterCars = function() {
+  let filter = document.getElementById('left').value;
+  cars = [];
+  data.cars.forEach((car) => {
+    if(filter === '' || car.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0) {
+      cars.push(car);
+    }
+  });
+  updateCarTable();
 };
 
 const loadJson = function() {
@@ -41,7 +58,7 @@ const loadJson = function() {
       data.cars.forEach((car) => {
         cars.push(car);
       });
-      updateCarTable();
+      updateCarTable();filterCars();
     }
   };
   
