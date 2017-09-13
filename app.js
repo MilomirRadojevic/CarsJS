@@ -2,9 +2,22 @@ let data = {};
 let cars = [];
 let selectedCars = [];
 
+const isNumberKey = function(evt) {
+  let charCode = (evt.which) ? evt.which : event.keyCode
+  if (charCode > 31 && (charCode < 48 || charCode > 57))
+    return false;
+  return true;
+}
+
+const toggleStartButton = function() {
+  let input = document.getElementById('left_bottom');
+  let button = document.getElementById('right_bottom');
+  button.disabled = !input.value;
+};
+
 const drawButtonBg = function() {
   let buttonBgImage = document.createElement('canvas');
-  var ctx = buttonBgImage.getContext("2d");
+  let ctx = buttonBgImage.getContext("2d");
 
   ctx.translate(22, 0);
   ctx.rotate(45 * Math.PI / 180);
@@ -19,7 +32,7 @@ const drawButtonBg = function() {
   ctx.stroke();
 
   let r = document.getElementById('right');
-  var dataURL = buttonBgImage.toDataURL('image/png');
+  let dataURL = buttonBgImage.toDataURL('image/png');
   r.style.backgroundImage = 'url(' + dataURL + ')';
 };
 

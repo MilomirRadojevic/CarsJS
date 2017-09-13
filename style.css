@@ -61,7 +61,7 @@ input[type='checkbox'] {
   color: transparent;
 }
 
-#right:hover {
+#right:hover, #right_bottom:hover:enabled {
   background-color: #DDDDDD;
   cursor: pointer;
 }
@@ -69,4 +69,28 @@ input[type='checkbox'] {
 canvas {
   margin: auto;
   display: block;
+}
+
+#bottom {
+  margin: auto;
+  text-align: right;
+  display: block;
+  width: 900px;
+}
+
+#left_bottom {
+  width: 100px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+#right_bottom {
+  width: 100px;
+  height: 24px;
+  border-radius: 10px;
+  text-shadow: 0 0 0 black;
+  -webkit-user-select: none;       
+  -moz-user-select: none;
+  -ms-user-select: none;
+  text-align: center;
 }

@@ -14,8 +14,15 @@
         <input type="text" id="left"></input>
         <input type="text" id="right" onclick="filterCars()" readonly></input>
       </div>
-      <table id="carTable"></table>    
+      
+      <table id="carTable"></table> 
+      
       <canvas id="road"></canvas>
+      
+      <div id="bottom">
+        <input type="text" id="left_bottom" onkeypress="return isNumberKey(event)" oninput="toggleStartButton()"></input>
+        <input type="button" id="right_bottom" onclick="startAnimation()" value="START" disabled></input>
+      </div>
     </div>
   </body>
 </html>
